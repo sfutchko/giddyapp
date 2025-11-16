@@ -28,7 +28,7 @@
     "@tanstack/react-query-devtools": "^5.17.19",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "cookies-next": "^6.1.1",
+    "cookies-next": "^4.2.1",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.312.0",
     "mapbox-gl": "^3.16.0",

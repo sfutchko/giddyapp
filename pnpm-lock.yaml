@@ -96,8 +96,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       cookies-next:
-        specifier: ^6.1.1
-        version: 6.1.1(next@14.1.0)(react@18.3.1)
+        specifier: ^4.2.1
+        version: 4.3.0
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -1662,6 +1662,10 @@ packages:
     dev: true
     optional: true
 
+  /@types/cookie@0.6.0:
+    resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
+    dev: false
+
   /@types/geojson-vt@3.2.5:
     resolution: {integrity: sha512-qDO7wqtprzlpe8FfQ//ClPV9xiuoh2nkIgiouIptON9w5jvD/fA4szvP9GBlDVdJ5dldAl0kX/sy3URbWwLx0g==}
     dependencies:
@@ -2434,20 +2438,21 @@ packages:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
     dev: true
 
+  /cookie@0.7.2:
+    resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
+    engines: {node: '>= 0.6'}
+    dev: false
+
   /cookie@1.0.2:
     resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
     engines: {node: '>=18'}
     dev: false
 
-  /cookies-next@6.1.1(next@14.1.0)(react@18.3.1):
-    resolution: {integrity: sha512-8JZBc4IN2m8xqOXyG7uicth6yH3SvynAUGSeV/FQ5lcEclzNGoR0+YCjySdn8r6keZdRyGQr4YJ8qy8F+Jq5uw==}
-    peerDependencies:
-      next: '>=15.0.0'
-      react: '>= 16.8.0'
+  /cookies-next@4.3.0:
+    resolution: {integrity: sha512-XxeCwLR30cWwRd94sa9X5lRCDLVujtx73tv+N0doQCFIDl83fuuYdxbu/WQUt9aSV7EJx7bkMvJldjvzuFqr4w==}
     dependencies:
-      cookie: 1.0.2
-      next: 14.1.0(react-dom@18.3.1)(react@18.3.1)
-      react: 18.3.1
+      '@types/cookie': 0.6.0
+      cookie: 0.7.2
     dev: false
 
   /cross-spawn@7.0.6:
