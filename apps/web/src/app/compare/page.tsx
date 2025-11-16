@@ -111,7 +111,8 @@ export default function ComparePage() {
                   </td>
                   {compareList.map((horse) => {
                     const value = (horse as any)[attr.key]
-                    const displayValue = attr.format ? attr.format(value as any) : (value || '-')
+                    // @ts-ignore - attr.format types are overly strict
+                    const displayValue = attr.format ? attr.format(value) : (value || '-')
 
                     return (
                       <td
