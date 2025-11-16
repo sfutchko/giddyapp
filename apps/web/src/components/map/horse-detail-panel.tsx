@@ -10,7 +10,7 @@ import { MakeOfferModal } from '@/components/offers/make-offer-modal'
 import { createClient } from '@/lib/supabase/client'
 import { getUserReputation, getUserReviews } from '@/lib/actions/reviews'
 import { getSimilarHorses } from '@/lib/actions/horses'
-import { DocumentViewerModal } from '@/components/documents/document-viewer-modal'
+// Removed DocumentViewerModal import - feature incomplete
 
 interface Horse {
   id: string
@@ -80,13 +80,7 @@ export function HorseDetailPanel({ horse, onClose, onHorseChange }: HorseDetailP
   const [sellerReviews, setSellerReviews] = useState<any[]>([])
   const [similarHorses, setSimilarHorses] = useState<any[]>([])
   const [similarHorsesType, setSimilarHorsesType] = useState<'breed' | 'nearby'>('breed')
-  const [viewingDocument, setViewingDocument] = useState<{
-    id: string
-    url: string
-    name: string
-    type: string
-    file_size?: number
-  } | null>(null)
+  // Removed viewingDocument state - feature incomplete
   const videoRef = useRef<HTMLVideoElement>(null)
   const supabase = createClient()
 
@@ -1037,14 +1031,7 @@ export function HorseDetailPanel({ horse, onClose, onHorseChange }: HorseDetailP
         sellerId={horse.seller_id || horse.owner_id || ''}
       />
 
-      {/* Document Viewer Modal */}
-      {viewingDocument && (
-        <DocumentViewerModal
-          isOpen={!!viewingDocument}
-          onClose={() => setViewingDocument(null)}
-          document={viewingDocument}
-        />
-      )}
+      {/* Document Viewer Modal - Removed (feature incomplete) */}
 
       <style jsx global>{`
         @keyframes fade-in {
