@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "cd apps/web && pnpm install --no-frozen-lockfile && pnpm build",
+  "buildCommand": "pnpm install --no-frozen-lockfile && cd apps/web && pnpm build",
   "devCommand": "cd apps/web && pnpm dev",
-  "installCommand": "pnpm install --no-frozen-lockfile --filter=web...",
+  "installCommand": "pnpm install --no-frozen-lockfile",
   "framework": null,
   "outputDirectory": "apps/web/.next"
 }
