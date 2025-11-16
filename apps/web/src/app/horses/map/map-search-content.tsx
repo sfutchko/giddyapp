@@ -575,7 +575,7 @@ export function MapSearchContent() {
                           <p className="text-xs text-gray-500 truncate">
                             {typeof horse.location === 'string'
                               ? horse.location
-                              : `${horse.location.city}, ${horse.location.state}`}
+                              : `${(horse.location as any)?.city || ''}, ${(horse.location as any)?.state || ''}`}
                           </p>
                           {/* Farm Info */}
                           {(horse as any).farm_name && (
