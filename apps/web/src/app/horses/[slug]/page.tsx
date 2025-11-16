@@ -235,7 +235,7 @@ export default async function HorseDetailsPage({
                 <SellerReviewsSection
                   sellerId={horse.seller_id}
                   sellerName={horse.profiles.full_name || horse.profiles.name || 'Seller'}
-                  reputation={sellerReputation}
+                  reputation={sellerReputation || null}
                   recentReviews={sellerReviews}
                 />
               )}
