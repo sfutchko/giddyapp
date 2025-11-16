@@ -46,7 +46,7 @@ export default async function HorseDetailsPage({
     sellerReputation = 'reputation' in reputationResult ? reputationResult.reputation : null
 
     const reviewsResult = await getUserReviews(horse.seller_id, { limit: 5 })
-    sellerReviews = 'reviews' in reviewsResult ? reviewsResult.reviews : []
+    sellerReviews = 'reviews' in reviewsResult ? reviewsResult.reviews || [] : []
   }
 
   // Get user's existing offer, viewing request, and messages for this horse
