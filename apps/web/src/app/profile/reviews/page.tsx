@@ -19,11 +19,11 @@ export default async function ProfileReviewsPage() {
 
   // Get reviews received by the user
   const receivedResult = await getUserReviews(user.id)
-  const receivedReviews = 'reviews' in receivedResult ? receivedResult.reviews : []
+  const receivedReviews = 'reviews' in receivedResult ? (receivedResult.reviews || []) : []
 
   // Get reviews written by the user
   const writtenResult = await getReviewsByUser(user.id)
-  const writtenReviews = 'reviews' in writtenResult ? writtenResult.reviews : []
+  const writtenReviews = 'reviews' in writtenResult ? (writtenResult.reviews || []) : []
 
   // Get user reputation
   const reputationResult = await getUserReputation(user.id)
