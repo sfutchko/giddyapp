@@ -1,0 +1,402 @@
+// Prisma schema for GiddyApp
+// Clean, normalized database design with proper relationships
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_DIRECT_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String
+  avatar        String?
+  role          UserRole       @default(BUYER)
+  verified      Boolean        @default(false)
+  stripeId      String?        @unique
+
+  // Authentication
+  authId        String         @unique // Supabase auth ID
+
+  // Profile
+  phone         String?
+  bio           String?
+  location      Json?          // Location object
+
+  // Relationships
+  horses        Horse[]
+  sentMessages  Message[]      @relation("SentMessages")
+  receivedMessages Message[]   @relation("ReceivedMessages")
+  conversations ConversationParticipant[]
+  buyerOffers   Offer[]        @relation("BuyerOffers")
+  sellerOffers  Offer[]        @relation("SellerOffers")
+  buyerTransactions Transaction[] @relation("BuyerTransactions")
+  sellerTransactions Transaction[] @relation("SellerTransactions")
+  favorites     Favorite[]
+  reviews       Review[]
+  notifications Notification[]
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+
+enum UserRole {
+  BUYER
+  SELLER
+  BOTH
+  ADMIN
+}
+
+model Horse {
+  id            String         @id @default(cuid())
+  name          String
+  slug          String         @unique
+  breed         String
+  age           Int
+  gender        Gender
+  color         String
+  height        Decimal        @db.Decimal(4, 2) // Height in hands
+  weight        Int?           // Weight in pounds
+  price         Decimal        @db.Decimal(10, 2)
+  description   String         @db.Text
+
+  // Location
+  location      Json           // Location object with lat/lng
+
+  // Seller
+  sellerId      String
+  seller        User           @relation(fields: [sellerId], references: [id])
+
+  // Status
+  status        ListingStatus  @default(DRAFT)
+  featured      Boolean        @default(false)
+  views         Int            @default(0)
+
+  // Relationships
+  images        HorseImage[]
+  videos        HorseVideo[]
+  healthRecords HealthRecord[]
+  competitions  Competition[]
+  training      Training[]
+  offers        Offer[]
+  transactions  Transaction[]
+  favorites     Favorite[]
+  reviews       Review[]
+  conversations Conversation[]
+
+  // Metadata
+  metadata      Json?          // Additional flexible data
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([sellerId])
+  @@index([status])
+  @@index([breed])
+  @@index([price])
+  @@index([slug])
+  @@fulltext([name, description])
+}
+
+enum Gender {
+  MARE
+  GELDING
+  STALLION
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  PENDING
+  SOLD
+  REMOVED
+}
+
+model HorseImage {
+  id            String         @id @default(cuid())
+  horseId       String
+  horse         Horse          @relation(fields: [horseId], references: [id], onDelete: Cascade)
+  url           String
+  thumbnailUrl  String?
+  caption       String?
+  isPrimary     Boolean        @default(false)
+  order         Int            @default(0)
+
+  createdAt     DateTime       @default(now())
+
+  @@index([horseId])
+}
+
+model HorseVideo {
+  id            String         @id @default(cuid())
+  horseId       String
+  horse         Horse          @relation(fields: [horseId], references: [id], onDelete: Cascade)
+  url           String
+  thumbnailUrl  String
+  caption       String?
+  duration      Int            // Duration in seconds
+  order         Int            @default(0)
+
+  createdAt     DateTime       @default(now())
+
+  @@index([horseId])
+}
+
+model HealthRecord {
+  id            String         @id @default(cuid())
+  horseId       String
+  horse         Horse          @relation(fields: [horseId], references: [id], onDelete: Cascade)
+  type          HealthRecordType
+  date          DateTime
+  veterinarian  String?
+  description   String         @db.Text
+  documentUrl   String?
+  expiresAt     DateTime?
+
+  createdAt     DateTime       @default(now())
+
+  @@index([horseId])
+  @@index([type])
+}
+
+enum HealthRecordType {
+  COGGINS
+  VACCINATION
+  PPE
+  ROUTINE_EXAM
+  DENTAL
+  FARRIER
+  INJURY
+  MEDICATION
+}
+
+model Competition {
+  id            String         @id @default(cuid())
+  horseId       String
+  horse         Horse          @relation(fields: [horseId], references: [id], onDelete: Cascade)
+  name          String
+  date          DateTime
+  discipline    Discipline
+  placement     String
+  notes         String?
+
+  createdAt     DateTime       @default(now())
+
+  @@index([horseId])
+}
+
+enum Discipline {
+  DRESSAGE
+  JUMPING
+  EVENTING
+  WESTERN
+  TRAIL
+  ENDURANCE
+  RACING
+  DRIVING
+  OTHER
+}
+
+model Training {
+  id            String         @id @default(cuid())
+  horseId       String
+  horse         Horse          @relation(fields: [horseId], references: [id], onDelete: Cascade)
+  discipline    Discipline
+  level         TrainingLevel
+  trainerName   String
+  startDate     DateTime
+  endDate       DateTime?
+  notes         String?
+
+  createdAt     DateTime       @default(now())
+
+  @@index([horseId])
+}
+
+enum TrainingLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  PROFESSIONAL
+}
+
+model Message {
+  id            String         @id @default(cuid())
+  conversationId String
+  conversation  Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId      String
+  sender        User           @relation("SentMessages", fields: [senderId], references: [id])
+  recipientId   String
+  recipient     User           @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  content       String         @db.Text
+  read          Boolean        @default(false)
+
+  createdAt     DateTime       @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([recipientId])
+}
+
+model Conversation {
+  id            String         @id @default(cuid())
+  horseId       String?
+  horse         Horse?         @relation(fields: [horseId], references: [id])
+  participants  ConversationParticipant[]
+  messages      Message[]
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([horseId])
+}
+
+model ConversationParticipant {
+  id              String         @id @default(cuid())
+  conversationId  String
+  conversation    Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User           @relation(fields: [userId], references: [id])
+  lastReadAt      DateTime?
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Offer {
+  id            String         @id @default(cuid())
+  horseId       String
+  horse         Horse          @relation(fields: [horseId], references: [id])
+  buyerId       String
+  buyer         User           @relation("BuyerOffers", fields: [buyerId], references: [id])
+  sellerId      String
+  seller        User           @relation("SellerOffers", fields: [sellerId], references: [id])
+  amount        Decimal        @db.Decimal(10, 2)
+  status        OfferStatus    @default(PENDING)
+  message       String?        @db.Text
+  expiresAt     DateTime
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([horseId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COUNTERED
+  EXPIRED
+  WITHDRAWN
+}
+
+model Transaction {
+  id            String         @id @default(cuid())
+  horseId       String
+  horse         Horse          @relation(fields: [horseId], references: [id])
+  buyerId       String
+  buyer         User           @relation("BuyerTransactions", fields: [buyerId], references: [id])
+  sellerId      String
+  seller        User           @relation("SellerTransactions", fields: [sellerId], references: [id])
+  amount        Decimal        @db.Decimal(10, 2)
+  buyerPremium  Decimal        @db.Decimal(10, 2)
+  sellerFee     Decimal        @db.Decimal(10, 2)
+  processingFee Decimal        @db.Decimal(10, 2)
+  total         Decimal        @db.Decimal(10, 2)
+  status        TransactionStatus @default(INITIATED)
+  stripePaymentId String?      @unique
+  escrowId      String?        @unique
+  completedAt   DateTime?
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([horseId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+}
+
+enum TransactionStatus {
+  INITIATED
+  ESCROW_PENDING
+  ESCROW_FUNDED
+  PPE_SCHEDULED
+  PPE_COMPLETE
+  SHIPPING_ARRANGED
+  DELIVERED
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+model Favorite {
+  id            String         @id @default(cuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id])
+  horseId       String
+  horse         Horse          @relation(fields: [horseId], references: [id])
+
+  createdAt     DateTime       @default(now())
+
+  @@unique([userId, horseId])
+  @@index([userId])
+  @@index([horseId])
+}
+
+model Review {
+  id            String         @id @default(cuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id])
+  horseId       String?
+  horse         Horse?         @relation(fields: [horseId], references: [id])
+  rating        Int            // 1-5 stars
+  title         String
+  content       String         @db.Text
+  verified      Boolean        @default(false) // Verified purchase
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([horseId])
+}
+
+model Notification {
+  id            String         @id @default(cuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id])
+  type          NotificationType
+  title         String
+  message       String
+  data          Json?          // Additional data
+  read          Boolean        @default(false)
+
+  createdAt     DateTime       @default(now())
+
+  @@index([userId])
+  @@index([read])
+}
+
+enum NotificationType {
+  NEW_MESSAGE
+  NEW_OFFER
+  OFFER_ACCEPTED
+  OFFER_REJECTED
+  PRICE_DROP
+  NEW_FAVORITE
+  REVIEW_POSTED
+  SYSTEM
+}
