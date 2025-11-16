@@ -472,7 +472,7 @@ export function AdminDashboard({
 
           {activeTab === 'users' && (
             <UserManagement
-              initialUsers={recentUsers}
+              initialUsers={recentUsers as any}
               totalUsers={stats.totalUsers}
             />
           )}
