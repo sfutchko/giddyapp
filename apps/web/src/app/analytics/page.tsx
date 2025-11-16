@@ -48,7 +48,7 @@ export default async function AnalyticsPage() {
     return acc
   }, {} as Record<string, { month: string; count: number; revenue: number }>) || {}
 
-  const monthlyData: { month: string; count: number; revenue: number }[] = Object.values(salesByMonth).slice(-12) // Last 12 months
+  const monthlyData = Object.values(salesByMonth).slice(-12) as { month: string; count: number; revenue: number }[] // Last 12 months
 
   // Get active listings count for comparison
   const { count: activeListings } = await supabase
